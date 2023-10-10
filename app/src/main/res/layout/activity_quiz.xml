@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#70DBA3"
+    android:backgroundTint="#FFFFFF"
     android:orientation="vertical"
     android:padding="24dp"
     tools:context=".QuizActivity">
@@ -23,14 +25,14 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <LinearLayout
+    <RadioGroup
         android:id="@+id/choices_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical">
 
-        <Button
+        <RadioButton
             android:id="@+id/choice_A"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,9 +40,11 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            android:text="@string/choice_a" />
+            android:gravity="center"
+            android:text="@string/choice_a"
+            android:button="@drawable/smooth_radio_button"/>
 
-        <Button
+        <RadioButton
             android:id="@+id/choice_B"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,9 +52,11 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            android:text="@string/choice_b" />
+            android:gravity="center"
+            android:text="@string/choice_b"
+            android:button="@drawable/smooth_radio_button"/>
 
-        <Button
+        <RadioButton
             android:id="@+id/choice_C"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,9 +64,11 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            android:text="@string/choice_c" />
+            android:gravity="center"
+            android:text="@string/choice_c"
+            android:button="@drawable/smooth_radio_button"/>
 
-        <Button
+        <RadioButton
             android:id="@+id/choice_D"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,9 +76,11 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            android:text="@string/choice_d" />
+            android:gravity="center"
+            android:text="@string/choice_d"
+            android:button="@drawable/smooth_radio_button"/>
 
-    </LinearLayout>
+    </RadioGroup>
 
     <Button
         android:id="@+id/submit_button"
@@ -78,6 +88,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/choices_layout"
         android:layout_marginTop="40dp"
+        android:backgroundTint="#FA70DCA4"
         android:text="@string/submit_button" />
 
 </RelativeLayout>

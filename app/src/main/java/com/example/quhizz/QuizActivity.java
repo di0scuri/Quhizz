@@ -8,9 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 
@@ -23,8 +26,10 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private static final String LOG_TAG = QuizActivity.class.getSimpleName();
 
     private TextView questionTextView;
-    private Button choiceA, choiceB, choiceC, choiceD;
+    private RadioButton choiceA, choiceB, choiceC, choiceD;
     private Button button_submit;
+
+    private RadioGroup choices_layout;
 
     private List<Integer> allQuestionIndices = new ArrayList<>();
 
@@ -94,7 +99,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // Enable or disable the submit button based on whether an answer is selected
-        button_submit.setEnabled(!selectedAnswer.isEmpty());
+        button_submit.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -108,6 +113,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         choiceC = findViewById(R.id.choice_C);
         choiceD = findViewById(R.id.choice_D);
         button_submit = findViewById(R.id.submit_button);
+        choices_layout = findViewById(R.id.choices_layout);
 
         choiceA.setOnClickListener(this);
         choiceB.setOnClickListener(this);
@@ -115,7 +121,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         choiceD.setOnClickListener(this);
         button_submit.setOnClickListener(this);
 
-        button_submit.setEnabled(false);
+        button_submit.setVisibility(View.INVISIBLE);
 
         loadNewRandomQuestion();
     }
@@ -123,36 +129,46 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-
         choiceA.setBackgroundColor(Color.DKGRAY);
         choiceB.setBackgroundColor(Color.DKGRAY);
         choiceC.setBackgroundColor(Color.DKGRAY);
         choiceD.setBackgroundColor(Color.DKGRAY);
 
-
         Button clickedButton = (Button) view;
         if (clickedButton.getId() == R.id.submit_button) {
             if (selectedAnswer.equals(QuestionsAndAnswers.correctAnswers[currentQuestionIndex])) {
                 score++;
-                playerAccuracy.add("true");
             } else {
-                playerAccuracy.add("false");
+                // Handle incorrect answers if needed
             }
             playerAnswer.add(selectedAnswer);
-            currentQuestionIndex++;
-            loadNewRandomQuestion();
 
-            Log.d(LOG_TAG, String.valueOf(playerAccuracy));
-            Log.d(LOG_TAG, String.valueOf(playerAnswer));
+            // Highlight the correct answer
+            highlightCorrectAnswer();
 
+            // Make the "Submit" button invisible
+            button_submit.setVisibility(View.INVISIBLE);
 
+            // Delay for 1 second before loading the next question
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    currentQuestionIndex++;
+                    loadNewRandomQuestion();
+
+                    Log.d(LOG_TAG, String.valueOf(playerAccuracy));
+                    Log.d(LOG_TAG, String.valueOf(playerAnswer));
+                    choices_layout.clearCheck();
+                }
+            }, 1000); // Delay for 1 second
         } else {
             selectedAnswer = clickedButton.getText().toString();
             clickedButton.setBackgroundColor(Color.MAGENTA);
-            button_submit.setEnabled(true);
+            // Make the "Submit" button visible when an answer is selected
+            button_submit.setVisibility(View.VISIBLE);
         }
-
     }
+
 
     /*public AlertDialog endQuiz() {
         AlertDialog dialog = savePrompt();
@@ -161,7 +177,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     }*/
 
     public void loadNewRandomQuestion() {
-        if (usedQuestionIndices.size() == totalQuestion) {
+        if (usedQuestionIndices.size() == 10) {
             //endQuiz();
             return;
         }
@@ -181,7 +197,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         choiceB.setText(QuestionsAndAnswers.choices[currentQuestionIndex][1]);
         choiceC.setText(QuestionsAndAnswers.choices[currentQuestionIndex][2]);
         choiceD.setText(QuestionsAndAnswers.choices[currentQuestionIndex][3]);
-        button_submit.setEnabled(false);
+        button_submit.setVisibility(View.INVISIBLE);
     }
 
     //AlertDialog savePrompt() {
@@ -190,22 +206,61 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     //    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
     //        @Override
     /**        public void onClick(DialogInterface dialogInterface, int which) {
-                Intent intent = new Intent(QuizActivity.this, showAnswers.class);
-                intent.putIntegerArrayListExtra("questionSequence", (ArrayList<Integer>) usedQuestionIndices);
-                intent.putStringArrayListExtra("playerAnswer", (ArrayList<String>) playerAnswer);
-                intent.putExtra("score", score);
-                startActivity(intent);
+     Intent intent = new Intent(QuizActivity.this, showAnswers.class);
+     intent.putIntegerArrayListExtra("questionSequence", (ArrayList<Integer>) usedQuestionIndices);
+     intent.putStringArrayListExtra("playerAnswer", (ArrayList<String>) playerAnswer);
+     intent.putExtra("score", score);
+     startActivity(intent);
 
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+     }
+     });
+     builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+    @Override
+    public void onClick(DialogInterface dialogInterface, int which) {
+    Intent intent = new Intent(QuizActivity.this, MainActivity.class);
+    startActivity(intent);
+    }
+    });
+
+     return builder.create();
+     }*/
+    private void highlightCorrectAnswer() {
+        String correctAnswer = QuestionsAndAnswers.correctAnswers[currentQuestionIndex];
+        Log.d(LOG_TAG, correctAnswer);
+        int backgroundColor = Color.DKGRAY;
+
+        String chosenAnswer = "";
+
+// Assuming you have some code to determine the value of chosenAnswer
+
+        if(choiceA.getText().toString().equals(correctAnswer)) {
+            choiceA.setBackgroundColor(Color.GREEN);
+        }else if(choiceB.getText().toString().equals(correctAnswer)) {
+            choiceA.setBackgroundColor(Color.GREEN);
+        }else if(choiceC.getText().toString().equals(correctAnswer)) {
+            choiceC.setBackgroundColor(Color.GREEN);
+        }else{
+            choiceD.setBackgroundColor(Color.GREEN);
+        }
+
+
+        final int finalBackgroundColor = backgroundColor;
+
+        // Delay for a short period (e.g., 1000 milliseconds) and then update the UI
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                Intent intent = new Intent(QuizActivity.this, MainActivity.class);
-                startActivity(intent);
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        choiceA.setBackgroundColor(finalBackgroundColor);
+                        choiceB.setBackgroundColor(finalBackgroundColor);
+                        choiceC.setBackgroundColor(finalBackgroundColor);
+                        choiceD.setBackgroundColor(finalBackgroundColor);
+                    }
+                });
             }
-        });
+        }, 1000); // Delay for 1 second
+    }
 
-        return builder.create();
-    }*/
 }

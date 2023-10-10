@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SmoothRadioButtonStyle">
+        <item name="android:background">@drawable/smooth_radio_button</item>
+        <item name="android:button">@null</item> <!-- This removes the default button appearance -->
+    </style>
+</resources>

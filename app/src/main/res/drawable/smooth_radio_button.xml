@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <layer-list>
+            <item android:id="@android:id/mask" android:drawable="@color/white" />
+            <item android:id="@android:id/background">
+                <shape android:shape="rectangle">
+                    <corners android:radius="8dp" /> <!-- Adjust the radius as needed -->
+                    <solid android:color="#FFFAFAFA" /> <!-- Background color when checked -->
+                    <stroke
+                        android:width="2dp"
+                        android:color="#FF707070" /> <!-- Border color when checked -->
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item>
+        <layer-list>
+            <item android:id="@android:id/mask" android:drawable="@color/white" />
+            <item android:id="@android:id/background">
+                <shape android:shape="rectangle">
+                    <corners android:radius="100dp" /> <!-- Adjust the radius as needed -->
+                    <solid android:color="#FFFAFAFA" /> <!-- Background color when not checked -->
+                    <stroke
+                        android:width="2dp"
+                        android:color="#FF707070" /> <!-- Border color when not checked -->
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>
