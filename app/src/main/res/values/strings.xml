@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Quhizz</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="quiz_categories">Categories</string>
+    <string name="news_placeholder">Quiz Description</string>
+    <string name="sports_info_placeholder">Quiz Subtitle</string>
+    <string name="question_text">Question Placeholder</string>
+    <string name="choice_a">A Placeholder</string>
+    <string name="choice_b">B Placeholder</string>
+    <string name="choice_c">C Placeholder</string>
+    <string name="choice_d">D Placeholder</string>
+    <string name="submit_button">Submit</string>
+
+    <string-array name="quiz_categories">
+        <item>Math</item>
+        <item>Science</item>
+        <item>Tech</item>
+        <item>Trivia</item>
+        <item>History</item>
+        <item>Geography</item>
+    </string-array>
+
+    <string-array name="quiz_subtitle">
+        <item>Click to take a Math quiz</item>
+        <item>Click to take a Science quiz</item>
+        <item>Click to take a Tech quiz</item>
+        <item>Click to take a Trivia quiz</item>
+        <item>Click to take a History quiz</item>
+        <item>Click to take a Geography quiz</item>
+    </string-array>
+
+    <array name="category_images">
+        <item>@drawable/math</item>
+        <item>@drawable/science</item>
+        <item>@drawable/tech</item>
+        <item>@drawable/trivia</item>
+        <item>@drawable/history</item>
+        <item>@drawable/geography</item>
+    </array>
+</resources>
