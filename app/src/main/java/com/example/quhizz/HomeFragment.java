@@ -1,5 +1,6 @@
 package com.example.quhizz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,41 +8,33 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
-import com.example.quhizz.databinding.FragmentFirstBinding;
 import com.google.android.material.snackbar.Snackbar;
 
-public class FirstFragment extends Fragment {
-
-private FragmentFirstBinding binding;
+public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
-      binding = FragmentFirstBinding.inflate(inflater, container, false);
-      return binding.getRoot();
-
+        return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
+        // Find the button in your XML layout by its ID
+        View myButton = view.findViewById(R.id.playButton);
+
+        // Set an OnClickListener for the button
+        myButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
+                // Handle the button click event here
+                // For example, you can start a new activity
+                Intent intent = new Intent(getActivity(), CategoryRecyclerView.class);
+                startActivity(intent);
             }
         });
     }
-
-@Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
 }
