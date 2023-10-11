@@ -47,4 +47,8 @@
     </array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_us">About Us</string>
+    <string name="about">ABOUT US</string>
+    <string name="to_know_more_about_us_please_visit_our_github_account">To know more about us please visit our Github account:</string>
+    <string name="github">GitHub</string>
 </resources>
