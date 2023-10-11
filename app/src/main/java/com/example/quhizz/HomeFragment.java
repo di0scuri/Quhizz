@@ -30,8 +30,6 @@ public class HomeFragment extends Fragment {
         myButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Handle the button click event here
-                // For example, you can start a new activity
                 Intent intent = new Intent(getActivity(), CategoryRecyclerView.class);
                 startActivity(intent);
             }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "267512964460",
+    "project_id": "quhizz",
+    "storage_bucket": "quhizz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267512964460:android:26ec638739551d0585ff49",
+        "android_client_info": {
+          "package_name": "com.example.quhizz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZQVxNmXSZqw2BV8mgxxIvlLgJ7QgEFT8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -47,4 +47,18 @@
     </array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="click_to_login">Click to login</string>
+    <string name="click_login">Click to login</string>
+    <string name="click_register">Click to register</string>
+    <string name="email">Email</string>
+    <string name="f_name">First Name</string>
+    <string name="l_name">Last Name</string>
+    <string name="birth_set">Set Birthday</string>
+    <string name="date">Date:</string>
+    <string name="datepicker">datepicker</string>
+    <string name="birthday">Default</string>
 </resources>

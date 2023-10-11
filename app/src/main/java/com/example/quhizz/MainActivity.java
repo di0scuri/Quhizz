@@ -1,5 +1,6 @@
 package com.example.quhizz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,11 +14,20 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.quhizz.databinding.ActivityMainBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
+
+    FirebaseAuth auth;
+
+    FirebaseDatabase db;
+
+    FirebaseUser user;
 
     ActivityMainBinding binding;
 
@@ -28,6 +38,16 @@ public class MainActivity extends AppCompatActivity {
         binding= ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         replaceFragment(new HomeFragment());
+
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app");
+        user = auth.getCurrentUser();
+
+        if (user == null){
+            Intent intent = new Intent(getApplicationContext(), Login.class);
+            startActivity(intent);
+            finish();
+        }else{
 
         binding.bottomNavView.setOnItemSelectedListener(item ->  {
             switch (item.getItemId()){
@@ -42,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
             return true;
-        });
+        });}
     }
 
     private void replaceFragment(Fragment fragment){
