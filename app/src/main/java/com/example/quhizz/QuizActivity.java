@@ -202,7 +202,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     //AlertDialog savePrompt() {
     //    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    //    builder.setTitle("Would you to see all the correct answers?");
+    //    builder.setTitle("Would you to lsee all the correct answers?");
     //    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
     //        @Override
     /**        public void onClick(DialogInterface dialogInterface, int which) {
