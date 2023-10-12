@@ -245,8 +245,6 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
 
         final int finalBackgroundColor = backgroundColor;
-
-        // Delay for a short period (e.g., 1000 milliseconds) and then update the UI
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

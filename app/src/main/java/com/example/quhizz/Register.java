@@ -7,22 +7,26 @@ import androidx.fragment.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quhizz.Login;
+import com.example.quhizz.R;
+import com.example.quhizz.Users;
 import com.example.quhizz.databinding.ActivityRegisterBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Register extends AppCompatActivity {
 
@@ -45,7 +49,7 @@ public class Register extends AppCompatActivity {
         progressBar = binding.progressBar;
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app");
+        db = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/");
         reference = db.getReference("Users");
 
         button_Register.setOnClickListener(new View.OnClickListener() {
@@ -58,54 +62,69 @@ public class Register extends AppCompatActivity {
                 userName = binding.username.getText().toString();
                 progressBar.setVisibility(View.VISIBLE);
 
-                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || birthday != null) {
+                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName)) {
                     Toast.makeText(Register.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
 
-                // Register the user with email and password
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Registration successful
-                                    FirebaseUser user = mAuth.getCurrentUser();
+                // Reference to the "Users" node in Firebase Realtime Database
+                DatabaseReference usersRef = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Users");
 
-                                    // Create a Users object with the user's information
-                                    Users userData = new Users(email, firstName, lastName, birthday, userName);
-                                    Log.d("Path", reference.toString());
+                // Check if the username already exists
+                usersRef.orderByChild("userName").equalTo(userName).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+                            // Username is not taken, proceed with user registration
+                            mAuth.createUserWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                            if (task.isSuccessful()) {
+                                                FirebaseUser user = mAuth.getCurrentUser();
 
-                                    // Store the Users object in Firebase Realtime Database
-                                    String userId = user.getUid();
-                                    reference.child(userName).setValue(userData)
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
+                                                // Create a Users object with the user's information
+                                                Users userData = new Users(email, firstName, lastName, birthday, userName);
 
-                                                    if (task.isSuccessful()) {
-                                                        Toast.makeText(getApplicationContext(), "Your account has been created", Toast.LENGTH_SHORT).show();
-                                                        Intent intent = new Intent(getApplicationContext(), Login.class);
-                                                        startActivity(intent);
-                                                        finish();
+                                                // Store the user data with the username as the key
+                                                reference.child(userName).setValue(userData)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Toast.makeText(getApplicationContext(), "Your account has been created", Toast.LENGTH_SHORT).show();
+                                                                    Intent intent = new Intent(getApplicationContext(), Login.class);
+                                                                    startActivity(intent);
+                                                                    finish();
+                                                                } else {
+                                                                    progressBar.setVisibility(View.GONE);
+                                                                    Toast.makeText(Register.this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                progressBar.setVisibility(View.GONE);
+                                                Toast.makeText(Register.this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(Register.this, "This username is already taken. Please choose another one.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-                                                    } else {
-                                                        progressBar.setVisibility(View.GONE);
-                                                        Toast.makeText(Register.this, "This email has been taken", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }
-                                            });
-                                } else {
-                                    // Handle registration failure
-                                    progressBar.setVisibility(View.GONE);
-                                    Toast.makeText(Register.this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(Register.this, "Database error. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
+
     public void loginNow(View view) {
         Intent intent = new Intent(getApplicationContext(), Login.class);
         startActivity(intent);
@@ -117,12 +136,12 @@ public class Register extends AppCompatActivity {
         newFragment.show(getSupportFragmentManager(), getString(R.string.datepicker));
     }
 
-    public void processDatePickerResult(int year, int month, int day){
+    public void processDatePickerResult(int year, int month, int day) {
         String month_string = Integer.toString(month + 1);
         String day_string = Integer.toString(day);
         String year_string = Integer.toString(year);
         String dateMessage = (month_string + "/" + day_string + "/" + year_string);
         Toast.makeText(this, getString(R.string.date) + dateMessage, Toast.LENGTH_SHORT).show();
-        birthday = getString(R.string.date) + dateMessage;
+        birthday = dateMessage;
     }
 }
