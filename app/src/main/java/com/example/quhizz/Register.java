@@ -58,7 +58,7 @@ public class Register extends AppCompatActivity {
                 userName = binding.username.getText().toString();
                 progressBar.setVisibility(View.VISIBLE);
 
-                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName)) {
+                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || birthday != null) {
                     Toast.makeText(Register.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
@@ -75,13 +75,6 @@ public class Register extends AppCompatActivity {
 
                                     // Create a Users object with the user's information
                                     Users userData = new Users(email, firstName, lastName, birthday, userName);
-                                    Log.d("Debug", "Email: " + email);
-                                    Log.d("Debug", "Password: " + password);
-                                    Log.d("Debug", "FirstName: " + firstName);
-                                    Log.d("Debug", lastName);
-                                    Log.d("Debug", birthday);
-                                    Log.d("Debug", userName);
-
                                     Log.d("Path", reference.toString());
 
                                     // Store the Users object in Firebase Realtime Database
@@ -90,13 +83,16 @@ public class Register extends AppCompatActivity {
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
+
                                                     if (task.isSuccessful()) {
-                                                        // Data saved successfully
-                                                        // You can redirect to the next screen or perform other actions here
+                                                        Toast.makeText(getApplicationContext(), "Your account has been created", Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(getApplicationContext(), Login.class);
+                                                        startActivity(intent);
+                                                        finish();
+
                                                     } else {
-                                                        // Handle database write failure
                                                         progressBar.setVisibility(View.GONE);
-                                                        Toast.makeText(Register.this, "Failed to save user data", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(Register.this, "This email has been taken", Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             });

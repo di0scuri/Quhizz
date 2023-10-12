@@ -29,6 +29,8 @@
     <string name="birth_set">Birthday</string>
     <string name="click_to_login">Already have an account</string>
     <string name="about">About</string>
+    <string name="datepicker">Date</string>
+    <string name="date">Date: </string>
     <string name="to_know_more_about_us_please_visit_our_github_account">To know more about us please visit our github account</string>
 
     <string-array name="quiz_categories">
