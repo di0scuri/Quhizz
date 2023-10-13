@@ -25,6 +25,6 @@
         android:layout_margin="16dp"
         android:src="@drawable/baseline_keyboard_return_24"
         android:tint="@color/white"
-        android:onClick="resetSports"/>
+        android:onClick="returnMain"/>
 
 </RelativeLayout>

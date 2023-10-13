@@ -28,6 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 public class Register extends AppCompatActivity {
 
     ActivityRegisterBinding binding;
@@ -82,13 +85,9 @@ public class Register extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<AuthResult> task) {
                                             if (task.isSuccessful()) {
-                                                FirebaseUser user = mAuth.getCurrentUser();
-
-                                                // Create a Users object with the user's information
+                                                String emailKey = encodeEmailAsKey(email);
                                                 Users userData = new Users(email, firstName, lastName, birthday, userName);
-
-                                                // Store the user data with the username as the key
-                                                reference.child(userName).setValue(userData)
+                                                reference.child(emailKey).setValue(userData)
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
@@ -99,7 +98,7 @@ public class Register extends AppCompatActivity {
                                                                     finish();
                                                                 } else {
                                                                     progressBar.setVisibility(View.GONE);
-                                                                    Toast.makeText(Register.this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(Register.this, "Failed to save data. Please try again.", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             }
                                                         });
@@ -124,6 +123,11 @@ public class Register extends AppCompatActivity {
             }
         });
     }
+    private String encodeEmailAsKey(String email) {
+        // Replace all characters that Firebase doesn't allow in keys with a safe character
+        return email.replace('.', '_');
+    }
+
 
     public void loginNow(View view) {
         Intent intent = new Intent(getApplicationContext(), Login.class);

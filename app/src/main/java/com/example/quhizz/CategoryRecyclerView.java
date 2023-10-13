@@ -1,5 +1,6 @@
 package com.example.quhizz;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.View;
@@ -39,9 +40,8 @@ public class CategoryRecyclerView extends AppCompatActivity {
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Replace with your navigation logic
-                // Intent intent = new Intent(SecondActivity.this, FirstActivity.class);
-                // startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -65,5 +65,11 @@ public class CategoryRecyclerView extends AppCompatActivity {
 
         // Notify the adapter of the change.
         mAdapter.notifyDataSetChanged();
+    }
+
+    public void returnMain(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
