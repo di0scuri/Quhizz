@@ -116,55 +116,41 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void saveScoreToDatabase() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Leaderboards");
+    private void saveScoreToDatabase(String subject,int score) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (currentUser == null) {
-            return;
-        }
 
         String userEmail = currentUser.getEmail();
-
-        userEmail = userEmail.replace(".","_");
+        String sanitizedEmail = userEmail.replace(".", "_");
 
         DatabaseReference usersRef = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Users");
 
-        usersRef.orderByChild(subject).equalTo(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.orderByChild("email").equalTo(sanitizedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    // Check if the dataSnapshot contains data
-                    if (dataSnapshot.exists() && dataSnapshot.hasChildren()) {
-                        // Iterate over the children of the dataSnapshot
-                        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                            try {
-                                // Attempt to retrieve data from the child snapshot
-                                Users similarUser = childSnapshot.getValue(Users.class);
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        String username = userSnapshot.child("userName").getValue(String.class);
 
-                                if (similarUser != null) {
-                                    // Data retrieval was successful
-                                    String username = similarUser.getUserName();
-                                    LeaderboardItem user = new LeaderboardItem(score);
-                                    DatabaseReference userRef = databaseReference.child(subject).child(username);
-                                    userRef.setValue(user);
-                                }else{
-                                    String username =
+                        if (username != null) {
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Leaderboards").child(subject).child(username);
+
+                            LeaderboardItem user = new LeaderboardItem(score);
+
+                            // Save the user's score to the specified location
+                            databaseReference.setValue(user).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    // Score saved successfully.
+                                    Toast.makeText(QuizActivity.this, "Score saved to the database", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(QuizActivity.this, "Failed to save score to the database", Toast.LENGTH_SHORT).show();
                                 }
-                            } catch (Exception e) {
-                                // Handle any exceptions that might occur while accessing the data
-                                e.printStackTrace(); // Log the exception for debugging
-                                Toast.makeText(QuizActivity.this, "Error while processing data.", Toast.LENGTH_SHORT).show();
-                            }
+                            });
                         }
-                    } else {
-                        Toast.makeText(QuizActivity.this, "No data available.", Toast.LENGTH_SHORT).show();
                     }
-                } catch (Exception e) {
-                    // Handle any exceptions that might occur at the top level of onDataChange
-                    e.printStackTrace(); // Log the exception for debugging
-                    Toast.makeText(QuizActivity.this, "Error while accessing data.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(QuizActivity.this, "No user data found.", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -174,6 +160,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
+
 
 
     @Override
@@ -233,7 +220,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void loadNewRandomQuestion() {
-        if (usedQuestionIndices.size() == 20) {
+        if (usedQuestionIndices.size() == 1) {
             endQuiz();
             return;
         }
@@ -299,7 +286,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
-                saveScoreToDatabase();
+                saveScoreToDatabase(subject,score);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
