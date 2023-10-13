@@ -59,9 +59,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        userEmail = currentUser.getEmail();
+
 
         Intent intent = getIntent();
         subject = intent.getStringExtra("key"); // Use the member variable subject
@@ -255,7 +253,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void loadNewRandomQuestion() {
-        if (usedQuestionIndices.size() == 1) {
+        if (usedQuestionIndices.size() == 20) {
             endQuiz();
             return;
         }

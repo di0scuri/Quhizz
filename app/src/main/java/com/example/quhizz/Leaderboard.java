@@ -15,6 +15,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,6 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -46,7 +50,7 @@ public class Leaderboard extends AppCompatActivity implements AdapterView.OnItem
         setContentView(R.layout.activity_leaderboard);
 
         Intent intent = getIntent();
-        subject = intent.getStringExtra("subject"); // Assign the value to subject
+        subject = intent.getStringExtra("subject");
 
         Spinner spinner = findViewById(R.id.sorting_spinner);
         if (spinner != null) {
@@ -62,32 +66,78 @@ public class Leaderboard extends AppCompatActivity implements AdapterView.OnItem
 
         databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("leaderboard");
 
-        // Create and set up the RecyclerView
         usersView.setLayoutManager(new LinearLayoutManager(this));
         leaderboardAdapter = new LeaderboardAdapter(leaderboardItemList);
         usersView.setAdapter(leaderboardAdapter);
 
-        Log.d(LOG_TAG, "Leaderboard onCreate");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String email = currentUser.getEmail();
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
+
+            // Step 1: Query the "Users" node to find the username
+            databaseReference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                            String username = userSnapshot.child("userName").getValue(String.class);
+                            // Now you have the username of the current user
+                            Log.d("CurrentUser", "Username: " + username);
+
+                            // Step 2: Query the "Leaderboards" node to find the score
+                            DatabaseReference leaderboardsReference = FirebaseDatabase.getInstance().getReference("Leaderboards/Math");
+                            leaderboardsReference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        Long score = dataSnapshot.child("score").getValue(Long.class);
+                                        TextView usernameTextView = findViewById(R.id.usernameTextView);
+                                        TextView totalScore = findViewById(R.id.total_score);
+                                        usernameTextView.setText(username);
+                                        totalScore.setText(String.valueOf(score));
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.e("Firebase", "Error: " + databaseError.getMessage());
+                                }
+                            });
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("Firebase", "Error: " + databaseError.getMessage());
+                }
+            });
+        }
+
+
         fetchLeaderboardData(currentSortingOrder,subject);
     }
 
     private void fetchLeaderboardData(String currentSortingOrder, String subject) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Leaderboards").child(subject);
-
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app")
+                .getReference("Leaderboards").child(subject);
         Query query;
-
-        if (currentSortingOrder.equals("ascending")) {
+        if (currentSortingOrder.equalsIgnoreCase("ascending")) {
             query = databaseReference.orderByChild("score");
-        } else if (currentSortingOrder.equals("descending")) {
-            query = databaseReference.orderByChild("score").limitToLast(10);
+        } else if (currentSortingOrder.equalsIgnoreCase("descending")) {
+            query = databaseReference.orderByChild("score").limitToLast(1000);
         } else {
-            query = databaseReference.orderByKey(); // Sort alphabetically by default
+            query = databaseReference.orderByKey();
         }
+
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 leaderboardItemList.clear();
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String username = snapshot.getKey();
                     int score = snapshot.child("score").getValue(Integer.class);
@@ -96,10 +146,13 @@ public class Leaderboard extends AppCompatActivity implements AdapterView.OnItem
                     leaderboardItemList.add(item);
                 }
 
-                if (currentSortingOrder.equals("ascending")) {
-                    Collections.sort(leaderboardItemList, (item1, item2) -> item1.getScore() - item2.getScore());
-                } else if (currentSortingOrder.equals("descending")) {
+                // Sort the data based on the selected sorting
+                if (currentSortingOrder.equals("Ascending")) {
                     Collections.sort(leaderboardItemList, (item1, item2) -> item2.getScore() - item1.getScore());
+                } else if (currentSortingOrder.equals("Descending")) {
+                    Collections.sort(leaderboardItemList, Comparator.comparingInt(LeaderboardItem::getScore));
+                } else {
+                    Collections.sort(leaderboardItemList, Comparator.comparing(LeaderboardItem::getUsername));
                 }
 
                 leaderboardAdapter.notifyDataSetChanged();
@@ -111,16 +164,13 @@ public class Leaderboard extends AppCompatActivity implements AdapterView.OnItem
                 // Handle errors if any.
             }
         });
-    }
-
-
+}
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long id) {
         String spinnerLabel = adapterView.getItemAtPosition(i).toString();
         currentSortingOrder = spinnerLabel;
 
-        // Fetch data based on the selected sorting order
         fetchLeaderboardData(currentSortingOrder, subject);
     }
 
