@@ -37,6 +37,8 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private RadioButton choiceA, choiceB, choiceC, choiceD;
     private Button button_submit;
 
+    private String userEmail;
+
     private String subject;
 
     private RadioGroup choices_layout;
@@ -57,6 +59,9 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        userEmail = currentUser.getEmail();
 
         Intent intent = getIntent();
         subject = intent.getStringExtra("key"); // Use the member variable subject
@@ -116,17 +121,12 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void saveScoreToDatabase(String subject,int score) {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+    private void saveScoreToDatabase(String userEmail ,String subject,int score) {
 
-
-        String userEmail = currentUser.getEmail();
-        String sanitizedEmail = userEmail.replace(".", "_");
 
         DatabaseReference usersRef = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Users");
 
-        usersRef.orderByChild("email").equalTo(sanitizedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.orderByChild("email").equalTo(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -134,17 +134,52 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                         String username = userSnapshot.child("userName").getValue(String.class);
 
                         if (username != null) {
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Leaderboards").child(subject).child(username);
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                                    .getReference("Leaderboards")
+                                    .child(subject)
+                                    .child(username);
 
-                            LeaderboardItem user = new LeaderboardItem(score);
+                            databaseReference.child("score").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if (snapshot.exists()) {
+                                        Integer recordedScore = snapshot.getValue(Integer.class);
+                                        if (recordedScore != null) {
+                                            if (recordedScore < score) {
+                                                databaseReference.child("score").setValue(score);
+                                            } else if (recordedScore > score) {
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(QuizActivity.this);
+                                                builder.setTitle("Are you sure you want to save the data?");
+                                                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        databaseReference.child("score").setValue(score);
+                                                    }
+                                                });
+                                                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // Handle the case when the user clicks "No"
+                                                    }
+                                                });
+                                                AlertDialog alertDialog = builder.create();
+                                                alertDialog.show();
+                                            } else {
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(QuizActivity.this);
+                                                builder.setTitle("You have the score is the same as your recorded score");
+                                                builder.setCancelable(true);
+                                                // Handle the case when the scores are the same
+                                            }
+                                        }
+                                    }else {
+                                        databaseReference.child("score").setValue(score);
+                                        Toast.makeText(getApplicationContext(), "Your score is saved in the database", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
 
-                            // Save the user's score to the specified location
-                            databaseReference.setValue(user).addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    // Score saved successfully.
-                                    Toast.makeText(QuizActivity.this, "Score saved to the database", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(QuizActivity.this, "Failed to save score to the database", Toast.LENGTH_SHORT).show();
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    Toast.makeText(QuizActivity.this, "Cannot connect to the database", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -155,15 +190,15 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(QuizActivity.this, "Failed to connect to the database", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(QuizActivity.this, "Cannot connect to Database", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
 
-    @Override
+            @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
@@ -173,18 +208,18 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         savedInstanceState.putIntegerArrayList("usedQuestionIndices", new ArrayList<>(usedQuestionIndices));
     }
 
-        @Override
-        public void onRestoreInstanceState(Bundle savedInstanceState) {
-            super.onRestoreInstanceState(savedInstanceState);
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
 
-            // Restore the saved data from the bundle
-            score = savedInstanceState.getInt("score");
-            currentQuestionIndex = savedInstanceState.getInt("currentQuestionIndex");
-            selectedAnswer = savedInstanceState.getString("selectedAnswer");
-            usedQuestionIndices = savedInstanceState.getIntegerArrayList("usedQuestionIndices");
+        // Restore the saved data from the bundle
+        score = savedInstanceState.getInt("score");
+        currentQuestionIndex = savedInstanceState.getInt("currentQuestionIndex");
+        selectedAnswer = savedInstanceState.getString("selectedAnswer");
+        usedQuestionIndices = savedInstanceState.getIntegerArrayList("usedQuestionIndices");
 
-            loadSavedQuestion();
-        }
+        loadSavedQuestion();
+    }
 
     public void loadSavedQuestion() {
 
@@ -282,12 +317,14 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     }
     AlertDialog savePrompt() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Would you to see all the correct answers?");
+        builder.setTitle("Would you like to save your score?");
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
-                saveScoreToDatabase(subject,score);
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                saveScoreToDatabase(userEmail,subject,score);
+                Intent intent = new Intent(getApplicationContext(), Leaderboard.class);
+                intent.putExtra("subject", subject);
+                Log.d(LOG_TAG, "Intent");
                 startActivity(intent);
             }
         });

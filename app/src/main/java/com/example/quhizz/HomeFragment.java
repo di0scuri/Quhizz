@@ -1,10 +1,12 @@
 package com.example.quhizz;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -23,10 +25,8 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Find the button in your XML layout by its ID
-        View myButton = view.findViewById(R.id.playButton);
+        ImageView myButton = view.findViewById(R.id.playButton);
 
-        // Set an OnClickListener for the button
         myButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
