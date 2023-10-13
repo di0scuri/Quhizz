@@ -1,6 +1,6 @@
 package com.example.quhizz;
 
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -15,7 +15,15 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +36,8 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private TextView questionTextView;
     private RadioButton choiceA, choiceB, choiceC, choiceD;
     private Button button_submit;
+
+    private String subject;
 
     private RadioGroup choices_layout;
 
@@ -44,68 +54,12 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private List<Integer> usedQuestionIndices = new ArrayList<>();
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        // Save important data to the bundle
-        savedInstanceState.putInt("score", score);
-        savedInstanceState.putInt("currentQuestionIndex", currentQuestionIndex);
-        savedInstanceState.putString("selectedAnswer", selectedAnswer);
-        savedInstanceState.putIntegerArrayList("usedQuestionIndices", new ArrayList<>(usedQuestionIndices));
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        // Restore the saved data from the bundle
-        score = savedInstanceState.getInt("score");
-        currentQuestionIndex = savedInstanceState.getInt("currentQuestionIndex");
-        selectedAnswer = savedInstanceState.getString("selectedAnswer");
-        usedQuestionIndices = savedInstanceState.getIntegerArrayList("usedQuestionIndices");
-
-        loadSavedQuestion();
-    }
-
-    // Modify this method to load the saved question
-    public void loadSavedQuestion() {
-        if (usedQuestionIndices.size() == totalQuestion) {
-            //endQuiz();
-            return;
-        }
-
-        questionTextView.setText(QuestionsAndAnswers.question[currentQuestionIndex]);
-        choiceA.setText(QuestionsAndAnswers.choices[currentQuestionIndex][0]);
-        choiceB.setText(QuestionsAndAnswers.choices[currentQuestionIndex][1]);
-        choiceC.setText(QuestionsAndAnswers.choices[currentQuestionIndex][2]);
-        choiceD.setText(QuestionsAndAnswers.choices[currentQuestionIndex][3]);
-
-        // Highlight the previously selected answer
-        if (!selectedAnswer.isEmpty()) {
-            switch (selectedAnswer) {
-                case "A":
-                    choiceA.setBackgroundColor(Color.MAGENTA);
-                    break;
-                case "B":
-                    choiceB.setBackgroundColor(Color.MAGENTA);
-                    break;
-                case "C":
-                    choiceC.setBackgroundColor(Color.MAGENTA);
-                    break;
-                case "D":
-                    choiceD.setBackgroundColor(Color.MAGENTA);
-                    break;
-            }
-        }
-
-        // Enable or disable the submit button based on whether an answer is selected
-        button_submit.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
+
+        Intent intent = getIntent();
+        subject = intent.getStringExtra("key"); // Use the member variable subject
 
         questionTextView = findViewById(R.id.question);
         choiceA = findViewById(R.id.choice_A);
@@ -126,7 +80,6 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         loadNewRandomQuestion();
     }
 
-
     @Override
     public void onClick(View view) {
         choiceA.setBackgroundColor(Color.DKGRAY);
@@ -138,18 +91,13 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         if (clickedButton.getId() == R.id.submit_button) {
             if (selectedAnswer.equals(QuestionsAndAnswers.correctAnswers[currentQuestionIndex])) {
                 score++;
-            } else {
-                // Handle incorrect answers if needed
             }
             playerAnswer.add(selectedAnswer);
 
-            // Highlight the correct answer
             highlightCorrectAnswer();
 
-            // Make the "Submit" button invisible
             button_submit.setVisibility(View.INVISIBLE);
 
-            // Delay for 1 second before loading the next question
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -164,27 +112,123 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             selectedAnswer = clickedButton.getText().toString();
             clickedButton.setBackgroundColor(Color.MAGENTA);
-            // Make the "Submit" button visible when an answer is selected
             button_submit.setVisibility(View.VISIBLE);
         }
     }
 
+    private void saveScoreToDatabase(String subject,int score) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
 
-    /*public AlertDialog endQuiz() {
-        AlertDialog dialog = savePrompt();
-        dialog.show();
-        return dialog;
-    }*/
+
+        String userEmail = currentUser.getEmail();
+        String sanitizedEmail = userEmail.replace(".", "_");
+
+        DatabaseReference usersRef = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Users");
+
+        usersRef.orderByChild("email").equalTo(sanitizedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        String username = userSnapshot.child("userName").getValue(String.class);
+
+                        if (username != null) {
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Leaderboards").child(subject).child(username);
+
+                            LeaderboardItem user = new LeaderboardItem(score);
+
+                            // Save the user's score to the specified location
+                            databaseReference.setValue(user).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    // Score saved successfully.
+                                    Toast.makeText(QuizActivity.this, "Score saved to the database", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(QuizActivity.this, "Failed to save score to the database", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                } else {
+                    Toast.makeText(QuizActivity.this, "No user data found.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(QuizActivity.this, "Failed to connect to the database", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putInt("score", score);
+        savedInstanceState.putInt("currentQuestionIndex", currentQuestionIndex);
+        savedInstanceState.putString("selectedAnswer", selectedAnswer);
+        savedInstanceState.putIntegerArrayList("usedQuestionIndices", new ArrayList<>(usedQuestionIndices));
+    }
+
+        @Override
+        public void onRestoreInstanceState(Bundle savedInstanceState) {
+            super.onRestoreInstanceState(savedInstanceState);
+
+            // Restore the saved data from the bundle
+            score = savedInstanceState.getInt("score");
+            currentQuestionIndex = savedInstanceState.getInt("currentQuestionIndex");
+            selectedAnswer = savedInstanceState.getString("selectedAnswer");
+            usedQuestionIndices = savedInstanceState.getIntegerArrayList("usedQuestionIndices");
+
+            loadSavedQuestion();
+        }
+
+    public void loadSavedQuestion() {
+
+        if (usedQuestionIndices.size() == 19) {
+            endQuiz();
+            return;
+        }
+
+        questionTextView.setText(QuestionsAndAnswers.question[currentQuestionIndex]);
+        choiceA.setText(QuestionsAndAnswers.choices[currentQuestionIndex][0]);
+        choiceB.setText(QuestionsAndAnswers.choices[currentQuestionIndex][1]);
+        choiceC.setText(QuestionsAndAnswers.choices[currentQuestionIndex][2]);
+        choiceD.setText(QuestionsAndAnswers.choices[currentQuestionIndex][3]);
+
+        if (!selectedAnswer.isEmpty()) {
+            switch (selectedAnswer) {
+                case "A":
+                    choiceA.setBackgroundColor(Color.MAGENTA);
+                    break;
+                case "B":
+                    choiceB.setBackgroundColor(Color.MAGENTA);
+                    break;
+                case "C":
+                    choiceC.setBackgroundColor(Color.MAGENTA);
+                    break;
+                case "D":
+                    choiceD.setBackgroundColor(Color.MAGENTA);
+                    break;
+            }
+        }
+
+        button_submit.setVisibility(View.INVISIBLE);
+    }
 
     public void loadNewRandomQuestion() {
-        if (usedQuestionIndices.size() == 10) {
-            //endQuiz();
+        if (usedQuestionIndices.size() == 1) {
+            endQuiz();
             return;
         }
 
         int randomIndex;
+        Random random = new Random();
         do {
-            randomIndex = new Random().nextInt(totalQuestion);
+            randomIndex = random.nextInt(totalQuestion);
         } while (usedQuestionIndices.contains(randomIndex));
 
         usedQuestionIndices.add(randomIndex);
@@ -200,49 +244,20 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         button_submit.setVisibility(View.INVISIBLE);
     }
 
-    //AlertDialog savePrompt() {
-    //    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    //    builder.setTitle("Would you to see all the correct answers?");
-    //    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    //        @Override
-    /**        public void onClick(DialogInterface dialogInterface, int which) {
-     Intent intent = new Intent(QuizActivity.this, showAnswers.class);
-     intent.putIntegerArrayListExtra("questionSequence", (ArrayList<Integer>) usedQuestionIndices);
-     intent.putStringArrayListExtra("playerAnswer", (ArrayList<String>) playerAnswer);
-     intent.putExtra("score", score);
-     startActivity(intent);
-
-     }
-     });
-     builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-    @Override
-    public void onClick(DialogInterface dialogInterface, int which) {
-    Intent intent = new Intent(QuizActivity.this, MainActivity.class);
-    startActivity(intent);
-    }
-    });
-
-     return builder.create();
-     }*/
     private void highlightCorrectAnswer() {
         String correctAnswer = QuestionsAndAnswers.correctAnswers[currentQuestionIndex];
         Log.d(LOG_TAG, correctAnswer);
         int backgroundColor = Color.DKGRAY;
 
-        String chosenAnswer = "";
-
-// Assuming you have some code to determine the value of chosenAnswer
-
-        if(choiceA.getText().toString().equals(correctAnswer)) {
+        if (choiceA.getText().toString().equals(correctAnswer)) {
             choiceA.setBackgroundColor(Color.GREEN);
-        }else if(choiceB.getText().toString().equals(correctAnswer)) {
-            choiceA.setBackgroundColor(Color.GREEN);
-        }else if(choiceC.getText().toString().equals(correctAnswer)) {
+        } else if (choiceB.getText().toString().equals(correctAnswer)) {
+            choiceB.setBackgroundColor(Color.GREEN);
+        } else if (choiceC.getText().toString().equals(correctAnswer)) {
             choiceC.setBackgroundColor(Color.GREEN);
-        }else{
+        } else if (choiceD.getText().toString().equals(correctAnswer)) {
             choiceD.setBackgroundColor(Color.GREEN);
         }
-
 
         final int finalBackgroundColor = backgroundColor;
         new Handler().postDelayed(new Runnable() {
@@ -258,7 +273,31 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
             }
-        }, 1000); // Delay for 1 second
+        }, 1000);
     }
-
+    public AlertDialog endQuiz() {
+        AlertDialog dialog = savePrompt();
+        dialog.show();
+        return dialog;
+    }
+    AlertDialog savePrompt() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Would you to see all the correct answers?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                saveScoreToDatabase(subject,score);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                Intent intent = new Intent(QuizActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        return builder.create();
+    }
 }

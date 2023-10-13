@@ -69,8 +69,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
         public void onClick(View view) {
             Categories currentCategory = mCategoriesData.get(getAdapterPosition());
             Intent intent = new Intent(mContext, QuizActivity.class);
-            intent.putExtra("quiz", currentCategory.getTitle());
-            intent.putExtra("imageResource", currentCategory.getImageResource());
+            intent.putExtra("key", mTitleText.getText().toString());
             mContext.startActivity(intent);
 
         }
