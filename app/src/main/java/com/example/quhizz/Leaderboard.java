@@ -82,7 +82,7 @@ public class Leaderboard extends AppCompatActivity implements AdapterView.OnItem
                         for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                             String username = userSnapshot.child("userName").getValue(String.class);
                             Log.d("CurrentUser", "Username: " + username);
-                            DatabaseReference leaderboardsReference = FirebaseDatabase.getInstance().getReference("Leaderboards/Math");
+                            DatabaseReference leaderboardsReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Leaderboards").child(subject);
                             leaderboardsReference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {

@@ -118,11 +118,8 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             button_submit.setVisibility(View.VISIBLE);
         }
     }
-
-    private void saveScoreToDatabase(String userEmail ,String subject,int score) {
-
-
-        DatabaseReference usersRef = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Users");
+    private void saveScoreToDatabase(String userEmail, String subject, int score) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Users");
 
         usersRef.orderByChild("email").equalTo(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -132,7 +129,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                         String username = userSnapshot.child("userName").getValue(String.class);
 
                         if (username != null) {
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance()
                                     .getReference("Leaderboards")
                                     .child(subject)
                                     .child(username);
@@ -146,6 +143,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                                             if (recordedScore < score) {
                                                 databaseReference.child("score").setValue(score);
                                             } else if (recordedScore > score) {
+                                                // Handle the case when the user wants to save a lower score
                                                 AlertDialog.Builder builder = new AlertDialog.Builder(QuizActivity.this);
                                                 builder.setTitle("Are you sure you want to save the data?");
                                                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -163,13 +161,15 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                                                 AlertDialog alertDialog = builder.create();
                                                 alertDialog.show();
                                             } else {
-                                                AlertDialog.Builder builder = new AlertDialog.Builder(QuizActivity.this);
-                                                builder.setTitle("You have the score is the same as your recorded score");
-                                                builder.setCancelable(true);
                                                 // Handle the case when the scores are the same
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(QuizActivity.this);
+                                                builder.setTitle("You have the same score as your recorded score");
+                                                builder.setCancelable(true);
+                                                AlertDialog alertDialog = builder.create();
+                                                alertDialog.show();
                                             }
                                         }
-                                    }else {
+                                    } else {
                                         databaseReference.child("score").setValue(score);
                                         Toast.makeText(getApplicationContext(), "Your score is saved in the database", Toast.LENGTH_SHORT).show();
                                     }
@@ -183,7 +183,14 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 } else {
-                    Toast.makeText(QuizActivity.this, "No user data found.", Toast.LENGTH_SHORT).show();
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        String username = userSnapshot.child("userName").getValue(String.class);
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                                .getReference("Leaderboards")
+                                .child(subject)
+                                .child(username);
+                        databaseReference.child("score").setValue(score);
+                    }
                 }
             }
 
@@ -193,9 +200,6 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-
-
-
             @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
