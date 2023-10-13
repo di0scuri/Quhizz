@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#70DBA3"
-    android:backgroundTint="#FFFFFF"
+    android:backgroundTint="#413543"
     android:orientation="vertical"
     android:padding="24dp"
     tools:context=".QuizActivity">
@@ -22,6 +22,7 @@
         android:layout_marginBottom="22dp"
         android:text="@string/question_text"
         android:textAlignment="center"
+        android:textColor="#98EECC"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -40,9 +41,10 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+            android:button="@drawable/smooth_radio_button"
             android:gravity="center"
             android:text="@string/choice_a"
-            android:button="@drawable/smooth_radio_button"/>
+            android:textColor="#FEFEFE" />
 
         <RadioButton
             android:id="@+id/choice_B"
@@ -52,9 +54,10 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+            android:button="@drawable/smooth_radio_button"
             android:gravity="center"
             android:text="@string/choice_b"
-            android:button="@drawable/smooth_radio_button"/>
+            android:textColor="#FEFEFE" />
 
         <RadioButton
             android:id="@+id/choice_C"
@@ -64,9 +67,10 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+            android:button="@drawable/smooth_radio_button"
             android:gravity="center"
             android:text="@string/choice_c"
-            android:button="@drawable/smooth_radio_button"/>
+            android:textColor="#FEFEFE" />
 
         <RadioButton
             android:id="@+id/choice_D"
@@ -76,9 +80,10 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+            android:button="@drawable/smooth_radio_button"
             android:gravity="center"
             android:text="@string/choice_d"
-            android:button="@drawable/smooth_radio_button"/>
+            android:textColor="#FEFEFE" />
 
     </RadioGroup>
 
