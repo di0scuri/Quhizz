@@ -4,9 +4,6 @@
     <item android:title="Home"
         android:id="@+id/home"
         android:icon="@drawable/baseline_home_24"/>
-    <item android:title="Leaderboards"
-        android:id="@+id/leaderboards"
-        android:icon="@drawable/baseline_leaderboard_24"/>
     <item android:title="About"
         android:id="@+id/about_us"
         android:icon="@drawable/baseline_info_24"/>

@@ -41,7 +41,7 @@ public class Register extends AppCompatActivity {
     ProgressBar progressBar;
     TextView loginNow;
 
-    String email, password, firstName, lastName, userName, birthday;
+    String email, password, firstName, lastName, userName, set_Birth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +63,10 @@ public class Register extends AppCompatActivity {
                 firstName = binding.firstName.getText().toString();
                 lastName = binding.lastName.getText().toString();
                 userName = binding.username.getText().toString();
+                set_Birth = binding.setBirth.getText().toString();
                 progressBar.setVisibility(View.VISIBLE);
 
-                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName)) {
+                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(set_Birth)) {
                     Toast.makeText(Register.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
@@ -86,7 +87,7 @@ public class Register extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<AuthResult> task) {
                                             if (task.isSuccessful()) {
                                                 String emailKey = encodeEmailAsKey(email);
-                                                Users userData = new Users(email, firstName, lastName, birthday, userName);
+                                                Users userData = new Users(email, firstName, lastName, set_Birth, userName);
                                                 reference.child(emailKey).setValue(userData)
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
@@ -146,6 +147,5 @@ public class Register extends AppCompatActivity {
         String year_string = Integer.toString(year);
         String dateMessage = (month_string + "/" + day_string + "/" + year_string);
         Toast.makeText(this, getString(R.string.date) + dateMessage, Toast.LENGTH_SHORT).show();
-        birthday = dateMessage;
     }
 }

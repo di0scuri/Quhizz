@@ -4,33 +4,22 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.widget.DatePicker;
-
+import android.widget.EditText;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.quhizz.R;
 import com.example.quhizz.Register;
-
 import java.util.Calendar;
 
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
-    // Rename and change types of parameters
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private String mParam1;
-    private String mParam2;
-
     public DatePickerFragment() {
-        // Remove the empty public constructor
     }
 
-    public static DatePickerFragment newInstance(String param1, String param2) {
-        DatePickerFragment fragment = new DatePickerFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static DatePickerFragment newInstance() {
+        return new DatePickerFragment();
     }
 
     @NonNull
@@ -44,11 +33,27 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
         return new DatePickerDialog(getActivity(), this, year, month, dayOfMonth);
     }
 
-
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        Register activity = (Register) getActivity();
-        activity.processDatePickerResult(year, month, day);
-    }
+        Calendar selectedDate = Calendar.getInstance();
+        selectedDate.set(year, month, day);
 
+        Calendar currentDate = Calendar.getInstance();
+
+        if (selectedDate.after(currentDate)) {
+
+            Toast.makeText(getActivity(), "Please select a date before today.", Toast.LENGTH_SHORT).show();
+        } else {
+            Register activity = (Register) getActivity();
+            if (activity != null) {
+                activity.processDatePickerResult(year, month, day);
+
+                EditText editText = activity.findViewById(R.id.set_Birth);
+                if (editText != null) {
+                    String selectedDateText = String.valueOf((month + 1)) + "/" + day + "/" + year;
+                    editText.setText(selectedDateText);
+                }
+            }
+        }
+    }
 }

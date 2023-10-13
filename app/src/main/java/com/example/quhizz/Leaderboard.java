@@ -75,17 +75,13 @@ public class Leaderboard extends AppCompatActivity implements AdapterView.OnItem
             String email = currentUser.getEmail();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
 
-            // Step 1: Query the "Users" node to find the username
             databaseReference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                             String username = userSnapshot.child("userName").getValue(String.class);
-                            // Now you have the username of the current user
                             Log.d("CurrentUser", "Username: " + username);
-
-                            // Step 2: Query the "Leaderboards" node to find the score
                             DatabaseReference leaderboardsReference = FirebaseDatabase.getInstance().getReference("Leaderboards/Math");
                             leaderboardsReference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

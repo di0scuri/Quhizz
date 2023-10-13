@@ -22,16 +22,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
-
     FirebaseAuth auth;
-
     FirebaseDatabase db;
-
     FirebaseUser user;
-
     ActivityMainBinding binding;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +47,6 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()){
                 case R.id.home:
                     replaceFragment(new HomeFragment());
-                    break;
-                case R.id.leaderboards:
-                    replaceFragment(new LeaderboardsFragment());
                     break;
                 case R.id.about_us:
                     replaceFragment(new AboutFragment());

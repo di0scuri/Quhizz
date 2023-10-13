@@ -74,4 +74,7 @@
     <string name="user_name">Username</string>
     <string name="full_name">Full Name</string>
     <string name="ready_to_play">Ready to Play?</string>
+    <string name="play">Play</string>
+    <string name="github_source">Github Source Code</string>
+    <string name="MMDDYYYY">MM/DD/YYYY</string>
 </resources>
