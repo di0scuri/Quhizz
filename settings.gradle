@@ -16,9 +16,10 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             url ("https://jcenter.bintray.com")
-            maven {} url 'https://jitpack.io'}
+            maven { url 'https://jitpack.io'}
         }
     }
+}
 
 rootProject.name = "Quhizz"
 include ':app'

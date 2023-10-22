@@ -1,124 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="15dp"
+    android:paddingLeft="20dp"
+    android:paddingTop="20dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="20dp"
+
     tools:context=".Register">
 
     <TextView
+        android:id="@+id/register_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
         android:gravity="center"
+        android:padding="5dp"
+        android:paddingBottom="20dp"
         android:text="@string/register"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profileView"
+        android:layout_width="94dp"
+        android:layout_height="93dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:background="@color/primary"
+        android:src="@drawable/account_profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/register_text"
+        app:shapeAppearanceOverlay="@style/circular"
+        app:strokeColor="@color/black"
+        app:strokeWidth="5dp" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/set_image">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/email"
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:paddingTop="10dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/password"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:inputType="textPassword"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:paddingTop="10dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/first_name"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/f_name"
-            android:inputType="text"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:paddingTop="10dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/first_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/f_name"
+                android:inputType="text" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/last_name"
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/l_name" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:paddingTop="10dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/last_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/l_name" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/username"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/username" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:paddingTop="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/username" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+    </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:id="@+id/set_Birth_layout"
+        android:layout_width="201dp"
+        android:layout_height="80dp"
+        android:paddingTop="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/set_Birth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/MMDDYYYY"
-            android:enabled="false"/>
+            android:layout_marginTop="12dp"
+            android:enabled="false"
+            android:hint="@string/Bithday" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/birth_set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/birth_set"
-        android:onClick="showDatePicker"/>
-
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-
+        android:onClick="showDatePicker"
+        android:text="@string/set_birthdate"
+        app:layout_constraintBottom_toBottomOf="@+id/set_Birth_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.367"
+        app:layout_constraintStart_toEndOf="@id/set_Birth_layout"
+        app:layout_constraintTop_toTopOf="@+id/set_Birth_layout" />
 
     <Button
         android:id="@+id/button_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/register" />
+        android:layout_marginTop="8dp"
+        android:text="@string/register"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/set_Birth_layout" />
 
     <TextView
-        android:id="@+id/loginNow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:textStyle="bold"
-        android:text="@string/click_to_login"
-        android:textSize="20sp"
-        android:onClick="loginNow"/>
+        android:onClick="toLoginPage"
+        android:text="Already have an account"
+        app:layout_constraintTop_toBottomOf="@id/button_register" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/set_image"
+        android:layout_width="66dp"
+        android:layout_height="57dp"
+        android:backgroundTint="@color/color_accent"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/profileView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.601"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shapeAppearanceOverlay="@style/circular"
+        app:srcCompat="@drawable/camera_test" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

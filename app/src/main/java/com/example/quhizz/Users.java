@@ -7,8 +7,9 @@ public class Users {
     private String birthday;
     private String userName;
 
+    private String profile;
+
     public Users() {
-        // Default constructor required for DataSnapshot.getValue(Users.class)
     }
 
     public Users(String email, String firstName, String lastName, String birthday, String userName) {
@@ -59,4 +60,5 @@ public class Users {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
 }

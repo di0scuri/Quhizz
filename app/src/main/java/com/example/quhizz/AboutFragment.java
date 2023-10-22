@@ -1,6 +1,8 @@
 package com.example.quhizz;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,10 +21,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import android.util.Base64;
 
 public class AboutFragment extends Fragment {
 
     private FirebaseAuth auth;
+
+    private String base64Image;
 
     public AboutFragment() {
     }
@@ -34,9 +39,16 @@ public class AboutFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_about, container, false);
 
-        ImageView imageView = view.findViewById(R.id.image_log);
+        ImageView LogOutView = view.findViewById(R.id.image_logout);
+        ImageView profileImageView = view.findViewById(R.id.profileImageView);
         ImageView repositoryButton = view.findViewById(R.id.source_code);
 
+        LogOutView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logOut(v);
+            }
+        });
         repositoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,7 +58,8 @@ public class AboutFragment extends Fragment {
 
         if (user != null) {
             String email = user.getEmail();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users");
+            email.replace('.', '_');
 
             databaseReference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -55,12 +68,19 @@ public class AboutFragment extends Fragment {
                         for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                             String fname = userSnapshot.child("firstName").getValue(String.class);
                             String lname = userSnapshot.child("lastName").getValue(String.class);
+                            String username = userSnapshot.child("userName").getValue(String.class);
 
                             TextView usernameAbout = view.findViewById(R.id.usernameAbout);
                             TextView nameAbout = view.findViewById(R.id.nameAbout);
 
-                            usernameAbout.setText(email);
+                            usernameAbout.setText(username);
                             nameAbout.setText(fname + " " + lname);
+
+                            base64Image = userSnapshot.child("profilePicture").getValue(String.class);
+                            if (base64Image != null){
+                                Bitmap bitmap = decodeBase64toBitmap(base64Image);
+                                profileImageView.setImageBitmap(bitmap);
+                            }
                         }
                     }
                 }
@@ -86,5 +106,16 @@ public class AboutFragment extends Fragment {
         } else {
             Toast.makeText(requireContext(), "Cannot get you to the repository", Toast.LENGTH_SHORT).show();
         }
+    }
+    private  Bitmap decodeBase64toBitmap(String base64image){
+        byte[] decodedBytes = Base64.decode(base64image, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+    public void logOut(View view) {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(requireContext(), Login.class);
+        startActivity(intent);
+        requireActivity().finish();
     }
 }

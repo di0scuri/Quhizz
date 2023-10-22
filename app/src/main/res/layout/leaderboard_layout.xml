@@ -16,14 +16,13 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
-        <TextView
-            android:id="@+id/img_text"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profile_leaderboards"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/baseline_circle_24"
             android:backgroundTint="@color/secondary"
             android:gravity="center"
-            android:text="A"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -38,7 +37,7 @@
             android:layout_marginStart="20dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/img_text"
+            app:layout_constraintStart_toEndOf="@id/profile_leaderboards"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.486">
 

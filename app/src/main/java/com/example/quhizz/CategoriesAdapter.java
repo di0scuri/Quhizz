@@ -15,16 +15,18 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> implements View.OnClickListener {
+public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 
+    private OnCategoryClickListener categoryClickListener;
     private ArrayList<Categories> mCategoriesData;
     private Context mContext;
 
-
-    CategoriesAdapter(Context context, ArrayList<Categories> categoriesData){
+    CategoriesAdapter(Context context, ArrayList<Categories> categoriesData, OnCategoryClickListener listener) {
         this.mCategoriesData = categoriesData;
         this.mContext = context;
+        this.categoryClickListener = listener;
     }
+
     @NonNull
     @Override
     public CategoriesAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,24 +39,17 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
         holder.bindTo(currentCategory);
     }
 
-
     @Override
     public int getItemCount() {
         return mCategoriesData.size();
     }
 
-    @Override
-    public void onClick(View v) {
-
-    }
-
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mTitleText;
         private TextView mInfoText;
         private ImageView mCategoryImage;
 
-        ViewHolder(View itemView){
+        ViewHolder(View itemView) {
             super(itemView);
 
             mTitleText = itemView.findViewById(R.id.title);
@@ -62,16 +57,14 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
             mCategoryImage = itemView.findViewById(R.id.sportsImage);
 
             itemView.setOnClickListener(this);
-
         }
 
         @Override
         public void onClick(View view) {
             Categories currentCategory = mCategoriesData.get(getAdapterPosition());
-            Intent intent = new Intent(mContext, QuizActivity.class);
-            intent.putExtra("key", mTitleText.getText().toString());
-            mContext.startActivity(intent);
-
+            if (categoryClickListener != null) {
+                categoryClickListener.onCategoryClick(currentCategory);
+            }
         }
 
         public void bindTo(Categories currentCategory) {
@@ -81,4 +74,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
         }
     }
 
+    public interface OnCategoryClickListener {
+        void onCategoryClick(Categories category);
+    }
 }

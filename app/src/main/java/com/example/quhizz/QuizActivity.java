@@ -37,8 +37,6 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private RadioButton choiceA, choiceB, choiceC, choiceD;
     private Button button_submit;
 
-    private String userEmail;
-
     private String subject;
 
     private RadioGroup choices_layout;
@@ -49,20 +47,26 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     private List<String> playerAccuracy = new ArrayList<>();
 
-    int score = 0;
-    private int totalQuestion = QuestionsAndAnswers.question.length;
+    private int score = 0;
+    private int totalQuestion;
     private int currentQuestionIndex = 0;
     private String selectedAnswer = "";
     private List<Integer> usedQuestionIndices = new ArrayList<>();
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+    private String userEmail;
+
+    private String[] questions;
+    private String[][] choices;
+    private String[] correctAnswers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-
         Intent intent = getIntent();
-        subject = intent.getStringExtra("key"); // Use the member variable subject
+        subject = intent.getStringExtra("key");
 
         questionTextView = findViewById(R.id.question);
         choiceA = findViewById(R.id.choice_A);
@@ -72,6 +76,12 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         button_submit = findViewById(R.id.submit_button);
         choices_layout = findViewById(R.id.choices_layout);
 
+        // ... other initialization code ...
+
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        userEmail = currentUser.getEmail();
+
         choiceA.setOnClickListener(this);
         choiceB.setOnClickListener(this);
         choiceC.setOnClickListener(this);
@@ -79,6 +89,51 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         button_submit.setOnClickListener(this);
 
         button_submit.setVisibility(View.INVISIBLE);
+
+        initializeQuiz();
+    }
+
+    private void initializeQuiz(){
+        totalQuestion = 20;
+
+        switch (subject){
+            case "Math":
+                questions = QuestionsAndAnswers.Math.questions;
+                choices = QuestionsAndAnswers.Math.choices;
+                correctAnswers = QuestionsAndAnswers.Math.correctAnswers;
+                break;
+            case "Science":
+                questions = QuestionsAndAnswers.Science.questions;
+                choices = QuestionsAndAnswers.Science.choices;
+                correctAnswers = QuestionsAndAnswers.Science.correctAnswers;
+                break;
+            case "History":
+                questions = QuestionsAndAnswers.History.questions;
+                choices = QuestionsAndAnswers.History.choices;
+                correctAnswers = QuestionsAndAnswers.History.correctAnswers;
+                break;
+            case "Trivia":
+                questions = QuestionsAndAnswers.Trivia.questions;
+                choices = QuestionsAndAnswers.Trivia.choices;
+                correctAnswers = QuestionsAndAnswers.Trivia.correctAnswers;
+                break;
+            case "Geography":
+                questions = QuestionsAndAnswers.Geography.questions;
+                choices = QuestionsAndAnswers.Geography.choices;
+                correctAnswers = QuestionsAndAnswers.Geography.correctAnswers;
+                break;
+            case "Technology":
+                questions = QuestionsAndAnswers.Technology.questions;
+                choices = QuestionsAndAnswers.Technology.choices;
+                correctAnswers = QuestionsAndAnswers.Technology.correctAnswers;
+                break;
+        }
+        usedQuestionIndices = new ArrayList<>();
+        currentQuestionIndex = 0;
+        score = 0;
+        selectedAnswer = "";
+        playerAnswer = new ArrayList<>();
+        playerAccuracy = new ArrayList<>();
 
         loadNewRandomQuestion();
     }
@@ -92,7 +147,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
         Button clickedButton = (Button) view;
         if (clickedButton.getId() == R.id.submit_button) {
-            if (selectedAnswer.equals(QuestionsAndAnswers.correctAnswers[currentQuestionIndex])) {
+            if (selectedAnswer.equals(correctAnswers[currentQuestionIndex])) {
                 score++;
             }
             playerAnswer.add(selectedAnswer);
@@ -119,8 +174,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     private void saveScoreToDatabase(String userEmail, String subject, int score) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Users");
-
+        DatabaseReference usersRef = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users");
         usersRef.orderByChild("email").equalTo(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -129,7 +183,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                         String username = userSnapshot.child("userName").getValue(String.class);
 
                         if (username != null) {
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app")
                                     .getReference("Leaderboards")
                                     .child(subject)
                                     .child(username);
@@ -185,11 +239,12 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                         String username = userSnapshot.child("userName").getValue(String.class);
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://quhizz-default-rtdb.asia-southeast1.firebasedatabase.app")
                                 .getReference("Leaderboards")
                                 .child(subject)
                                 .child(username);
                         databaseReference.child("score").setValue(score);
+                        Toast.makeText(getApplicationContext(), "Saved to database", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -230,11 +285,11 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        questionTextView.setText(QuestionsAndAnswers.question[currentQuestionIndex]);
-        choiceA.setText(QuestionsAndAnswers.choices[currentQuestionIndex][0]);
-        choiceB.setText(QuestionsAndAnswers.choices[currentQuestionIndex][1]);
-        choiceC.setText(QuestionsAndAnswers.choices[currentQuestionIndex][2]);
-        choiceD.setText(QuestionsAndAnswers.choices[currentQuestionIndex][3]);
+        questionTextView.setText(questions[currentQuestionIndex]);
+        choiceA.setText(choices[currentQuestionIndex][0]);
+        choiceB.setText(choices[currentQuestionIndex][1]);
+        choiceC.setText(choices[currentQuestionIndex][2]);
+        choiceD.setText(choices[currentQuestionIndex][3]);
 
         if (!selectedAnswer.isEmpty()) {
             switch (selectedAnswer) {
@@ -257,7 +312,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void loadNewRandomQuestion() {
-        if (usedQuestionIndices.size() == 20) {
+        if (usedQuestionIndices.size() == 1) {
             endQuiz();
             return;
         }
@@ -273,16 +328,16 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
         allQuestionIndices.add(currentQuestionIndex);
 
-        questionTextView.setText(QuestionsAndAnswers.question[currentQuestionIndex]);
-        choiceA.setText(QuestionsAndAnswers.choices[currentQuestionIndex][0]);
-        choiceB.setText(QuestionsAndAnswers.choices[currentQuestionIndex][1]);
-        choiceC.setText(QuestionsAndAnswers.choices[currentQuestionIndex][2]);
-        choiceD.setText(QuestionsAndAnswers.choices[currentQuestionIndex][3]);
+        questionTextView.setText(questions[currentQuestionIndex]);
+        choiceA.setText(choices[currentQuestionIndex][0]);
+        choiceB.setText(choices[currentQuestionIndex][1]);
+        choiceC.setText(choices[currentQuestionIndex][2]);
+        choiceD.setText(choices[currentQuestionIndex][3]);
         button_submit.setVisibility(View.INVISIBLE);
     }
 
     private void highlightCorrectAnswer() {
-        String correctAnswer = QuestionsAndAnswers.correctAnswers[currentQuestionIndex];
+        String correctAnswer = correctAnswers[currentQuestionIndex];
         Log.d(LOG_TAG, correctAnswer);
         int backgroundColor = Color.DKGRAY;
 
@@ -324,10 +379,16 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 saveScoreToDatabase(userEmail,subject,score);
-                Intent intent = new Intent(getApplicationContext(), Leaderboard.class);
-                intent.putExtra("subject", subject);
-                Log.d(LOG_TAG, "Intent");
-                startActivity(intent);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(getApplicationContext(), Leaderboard.class);
+                        intent.putExtra("subject", subject);
+                        Log.d(LOG_TAG, "Intent");
+                        startActivity(intent);
+                    }
+                }, 3000);
+
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {

@@ -65,7 +65,7 @@
 
 
         <ImageView
-            android:id="@+id/image_log"
+            android:id="@+id/image_logout"
             android:layout_width="65dp"
             android:layout_height="63dp"
             android:layout_marginBottom="244dp"
@@ -87,16 +87,17 @@
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.793"
+            app:layout_constraintHorizontal_bias="0.815"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.74" />
+            app:layout_constraintVertical_bias="0.739" />
 
-        <ImageView
-            android:id="@+id/imageView7"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profileImageView"
             android:layout_width="136dp"
             android:layout_height="126dp"
             android:src="@drawable/user_profile"
+            app:shapeAppearanceOverlay="@style/circular"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.134"
