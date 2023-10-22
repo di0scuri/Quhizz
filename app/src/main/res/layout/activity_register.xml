@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
+    android:backgroundTint="#413543"
     android:gravity="center"
     android:orientation="vertical"
     android:paddingLeft="20dp"
     android:paddingTop="20dp"
+
     android:paddingRight="20dp"
     android:paddingBottom="20dp"
-
     tools:context=".Register">
 
     <TextView
@@ -21,6 +23,7 @@
         android:padding="5dp"
         android:paddingBottom="20dp"
         android:text="@string/register"
+        android:textColor="#98EECC"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,6 +64,9 @@
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#98EECC"
+                android:backgroundTint="#98EECC"
+                android:singleLine="true"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -74,6 +80,8 @@
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#98EECC"
+                android:singleLine="true"
                 android:hint="@string/password"
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -87,6 +95,8 @@
                 android:id="@+id/first_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#98EECC"
+                android:singleLine="true"
                 android:hint="@string/f_name"
                 android:inputType="text" />
 
@@ -101,6 +111,8 @@
                 android:id="@+id/last_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#98EECC"
+                android:singleLine="true"
                 android:hint="@string/l_name" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -113,6 +125,8 @@
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#98EECC"
+                android:singleLine="true"
                 android:hint="@string/username" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -132,7 +146,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:background="#98EECC"
             android:enabled="false"
+            android:singleLine="true"
             android:hint="@string/Bithday" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -165,7 +181,9 @@
         android:gravity="center"
         android:onClick="toLoginPage"
         android:text="Already have an account"
-        app:layout_constraintTop_toBottomOf="@id/button_register" />
+        android:textColor="#97EDCB"
+        app:layout_constraintTop_toBottomOf="@id/button_register"
+        tools:layout_editor_absoluteX="20dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/set_image"

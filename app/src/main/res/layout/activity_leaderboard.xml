@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#413543"
     tools:context=".Leaderboard">
 
 
@@ -12,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:background="#6750A3"
         android:elevation="3dp"
         android:orientation="vertical"
         android:paddingTop="8dp"
@@ -37,8 +39,8 @@
             android:id="@+id/total_users"
             android:layout_width="184dp"
             android:layout_height="35dp"
-            android:layout_marginEnd="4dp"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="4dp"
             android:text="Total Players: 0"
             android:textColor="@color/black"
             android:textSize="20dp"
@@ -52,6 +54,7 @@
 
 
     </LinearLayout>
+
     <Spinner
         android:id="@+id/sorting_spinner"
         android:layout_width="wrap_content"
@@ -69,6 +72,7 @@
         android:layout_height="0dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:background="#97EDCB"
         app:layout_constraintBottom_toTopOf="@+id/linear2"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -83,6 +87,7 @@
         android:layout_marginEnd="372dp"
         android:layout_marginBottom="8dp"
         android:background="#D8EDED"
+        android:backgroundTint="#6750A4"
         android:elevation="3dp"
         android:orientation="horizontal"
         android:padding="8dp"
@@ -125,8 +130,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
             android:text="Score: 0"
-            android:textSize="20dp"
             android:textColor="@color/black"
+            android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="@+id/currentUsernameTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/currentUsernameTextView"
